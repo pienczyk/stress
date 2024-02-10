@@ -4,8 +4,8 @@ name: image-ci
 # on push to the stress branch
 on:
   push:
-    branches:
-      - 'stress'
+    tags:
+      - '*'
 
 env:
   stress_image_name: 'pienczyk/stress'
@@ -18,6 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Install QEMU static binaries.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Set up Docker Buildx.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       # Login to the Docker Hub. Secrets are configured in the GitHub/repository/settings/secrets/actions
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -29,15 +37,23 @@ jobs:
 
       # stress
       # Build metadata for stress image
-      - name: stress Docker metadata
-        id: metastress
+      - name: Docker metadata
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
             ${{ env.stress_image_name }}
 
           tags: |
-            type=raw,value=latest
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value={{date 'YYYYMMDD'}}-{{sha}}
+            type=semver,pattern=v{{version}}
+
+      # Build and push stress to the Docker hub
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          file: ./Dockerfile
+          context: ./
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
