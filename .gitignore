@@ -1,0 +1,16 @@
+# SSH
+**/.ssh/id_*
+**/.ssh/*_id_*
+**/.ssh/known_hosts
+
+# Docker
+Dockerfile
+
+# vsode
+.DS_Store
+**/tmp
+
+# Ignore vim files:
+*~
+*.swp
+*.swo
