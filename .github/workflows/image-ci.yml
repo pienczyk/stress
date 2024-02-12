@@ -58,8 +58,8 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
 
-      # Scan api-node image with Trivy vulnerability scanner
-      - name: api-node run Trivy vulnerability scanner
+      # Scan the image with Trivy vulnerability scanner
+      - name: Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.stress_image_name }}:latest'
